@@ -300,6 +300,13 @@ const AppContent: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const backendUrl = import.meta.env.VITE_API_URL || "https://swavik-resolvex-backend.onrender.com";
+    fetch(backendUrl)
+      .then(() => console.log("Backend awake"))
+      .catch(() => console.log("Backend wake attempt"));
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (usr) => {
       if (usr) {
         setIsAuthenticated(true);
