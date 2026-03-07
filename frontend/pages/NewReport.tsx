@@ -101,6 +101,7 @@ const NewReport: React.FC = () => {
         date: startDate ? startDate.toISOString().split('T')[0] : "",
         severity,
         report: data.report,
+        timeline: data.timeline || [], // Save AI timeline
         logs: logs,
         logFileName: fileName,
         status: "generated",
@@ -118,7 +119,8 @@ const NewReport: React.FC = () => {
           date: startDate ? startDate.toISOString().split('T')[0] : "",
           severity,
           assignee,
-          priority
+          priority,
+          timeline: data.timeline || [] // Pass timeline for immediate view
         }
       });
 

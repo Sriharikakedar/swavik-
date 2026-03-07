@@ -3,6 +3,11 @@ import { useLocation, useNavigate } from "react-router-dom"
 import jsPDF from "jspdf"
 import { db } from "../firebase/firebase"
 import { deleteDoc, doc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore"
+import {
+  VerticalTimeline,
+  VerticalTimelineElement,
+} from "react-vertical-timeline-component";
+import "react-vertical-timeline-component/style.min.css";
 // @ts-ignore
 import { marked } from "marked"
 import toast from "react-hot-toast";
@@ -105,7 +110,30 @@ const ViewReport: React.FC = () => {
     doc.setFontSize(titleSize);
     doc.setTextColor(0, 0, 0);
     doc.text("Incident Report", margin, 32);
-    y = 45;
+    y = 42;
+
+    // Add Timeline to PDF
+    if (report.timeline && report.timeline.length > 0) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
+      doc.text("Incident Timeline", margin, y);
+      y += 8;
+
+      report.timeline.forEach((item: any) => {
+        if (y > pageHeight - 20) { doc.addPage(); y = 30; }
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(0, 0, 0);
+        doc.text(item.time, margin, y);
+
+        doc.setFont("helvetica", "normal");
+        doc.text(`- ${item.event}`, margin + 15, y);
+        y += 6;
+      });
+      y += 6;
+    }
 
     // Split report into sections and clean markdown
     const lines = report.split('\n');
@@ -202,6 +230,34 @@ const ViewReport: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Incident Timeline Section */}
+      {report.timeline && report.timeline.length > 0 && (
+        <div className="mb-20">
+          <div className="mb-8">
+            <h2 className="text-2xl font-black text-theme-text flex items-center gap-3">
+              <i className="fas fa-history text-theme-accent"></i>
+              Incident Timeline
+            </h2>
+            <p className="text-theme-dim text-[10px] font-black uppercase tracking-widest mt-1">AI-reconstructed sequence of events</p>
+          </div>
+
+          <VerticalTimeline layout="1-column-left" lineColor="#1A2B4C20">
+            {report.timeline.map((item: any, index: number) => (
+              <VerticalTimelineElement
+                key={index}
+                date={item.time}
+                contentStyle={{ background: '#F8F3ED', color: '#1A2B4C', border: '1px solid #1A2B4C10', borderRadius: '1.5rem', boxShadow: 'none' }}
+                contentArrowStyle={{ borderRight: '7px solid #F8F3ED' }}
+                iconStyle={{ background: '#D1603D', color: '#fff' }}
+                icon={<i className="fas fa-bolt text-[10px] flex items-center justify-center h-full"></i>}
+              >
+                <h3 className="text-sm font-black text-theme-text uppercase tracking-wide">{item.event}</h3>
+              </VerticalTimelineElement>
+            ))}
+          </VerticalTimeline>
+        </div>
+      )}
 
       <div className="bg-theme-card border border-theme-border p-12 rounded-[2.5rem] mb-10 shadow-2xl overflow-hidden relative group max-w-full">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-theme-accent to-transparent opacity-50"></div>
