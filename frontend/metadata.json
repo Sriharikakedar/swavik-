@@ -1,0 +1,5 @@
+{
+  "name": "ResolveX – AI Postmortem Generator",
+  "description": "An AI-driven incident analysis platform designed to transform telemetry and logs into blameless postmortem reviews instantly.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResolveX – AI Postmortem Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              DEFAULT: '#1A2B4C',
+              dark: '#14213d',
+              light: '#2a3b5c',
+            },
+            cream: {
+              DEFAULT: '#F8F3ED',
+              dark: '#f0e6d8',
+              light: '#ffffff',
+            },
+            orange: {
+              DEFAULT: '#D1603D',
+              dark: '#b54d2e',
+              light: '#e07a5f',
+            },
+            charcoal: '#4A4A4A',
+            // Semantic Theme Colors
+            'theme-bg': 'var(--bg-main)',
+            'theme-text': 'var(--text-main)',
+            'theme-card': 'var(--card-bg)',
+            'theme-border': 'var(--border-color)',
+            'theme-accent': 'var(--accent)',
+            'theme-dim': 'var(--text-dim)',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #F8F3ED;
+      --text-main: #1A2B4C;
+      --card-bg: #FFFFFF;
+      --border-color: rgba(26, 43, 76, 0.1);
+      --accent: #D1603D;
+      --text-dim: rgba(74, 74, 74, 0.6);
+    }
+
+    .dark {
+      --bg-main: #0F172A;
+      --text-main: #F1F5F9;
+      --card-bg: #1E293B;
+      --border-color: rgba(241, 245, 249, 0.1);
+      --accent: #F97316;
+      --text-dim: rgba(203, 213, 225, 0.6);
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Standard scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-main);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--text-main);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    /* Typography for Reports */
+    .prose-resolve {
+      line-height: 1.6;
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .prose-resolve h1,
+    .prose-resolve h2,
+    .prose-resolve h3 {
+      color: var(--text-main);
+      font-weight: 800;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .prose-resolve h2 {
+      font-size: 1.5rem;
+      border-left: 4px solid var(--accent);
+      padding-left: 1rem;
+    }
+
+    .prose-resolve p {
+      margin-bottom: 1.25rem;
+    }
+
+    .prose-resolve ul,
+    .prose-resolve ol {
+      margin-bottom: 1.25rem;
+      padding-left: 1.5rem;
+      list-style-type: disc;
+    }
+
+    .prose-resolve li {
+      margin-bottom: 0.5rem;
+    }
+
+    .prose-resolve strong {
+      color: var(--text-main);
+      font-weight: 700;
+    }
+
+    .prose-resolve hr {
+      border: 0;
+      border-top: 1px solid var(--border-color);
+      margin: 2rem 0;
+    }
+  </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "marked": "https://esm.sh/marked@^15.0.0"
+  }
+}
+</script>
+  <link rel="stylesheet" href="/index.css">
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
+</html>
