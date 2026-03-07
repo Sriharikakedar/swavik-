@@ -30,12 +30,21 @@ if (!openai && !genAI) {
   console.log("⚠️  NO AI KEYS DETECTED — Using high-fidelity Pattern Fallback. Set keys in backend/.env");
 }
 
-const SRE_PROMPT = (logs) => `You are an elite Site Reliability Engineer (SRE). Analyze these logs and generate a professional, structured incident postmortem (RCAs). 
+const SRE_PROMPT = (logs) => `You are an elite Site Reliability Engineer (SRE). Analyze these logs and generate a professional incident intelligence package.
 
 LOG DATA:
 ${logs.substring(0, 30000)}
 
-Structure the report with these Markdown headers:
+YOUR RESPONSE MUST BE A VALID JSON OBJECT WITH THIS STRUCTURE:
+{
+  "report": "Complete Markdown report following the structure below...",
+  "timeline": [
+    {"time": "HH:MM", "event": "Technical description of the event"},
+    ...
+  ]
+}
+
+REPORT STRUCTURE FOR THE "report" FIELD:
 ## Incident Summary (brief overview)
 ## Timeline (bullet points of key log events)
 ## Root Cause Analysis (technical deep dive)
@@ -56,7 +65,7 @@ app.post("/generate", async (req, res) => {
   if (!logs) return res.status(400).json({ error: "Logs are required" });
 
   try {
-    let generatedReport = null;
+    let rawAIResponse = null;
 
     // 1. Try OpenAI (Priority 1)
     if (openai) {
@@ -64,12 +73,13 @@ app.post("/generate", async (req, res) => {
         const completion = await openai.chat.completions.create({
           model: "gpt-4o",
           messages: [
-            { role: "system", content: "You are a professional SRE. Output structured Markdown reports." },
+            { role: "system", content: "You are a professional SRE. Output strictly valid JSON." },
             { role: "user", content: SRE_PROMPT(logs) }
           ],
+          response_format: { type: "json_object" },
           temperature: 0.2,
         });
-        generatedReport = completion.choices[0].message.content;
+        rawAIResponse = completion.choices[0].message.content;
         console.log("✅ Analysis complete via OpenAI");
       } catch (err) {
         console.error("❌ OpenAI failed, attempting failover...");
@@ -77,45 +87,56 @@ app.post("/generate", async (req, res) => {
     }
 
     // 2. Try Gemini (Priority 2 / Failover)
-    if (!generatedReport && genAI) {
+    if (!rawAIResponse && genAI) {
       try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({
+          model: "gemini-1.5-flash",
+          generationConfig: { responseMimeType: "application/json" }
+        });
         const result = await model.generateContent(SRE_PROMPT(logs));
-        generatedReport = result.response.text();
+        rawAIResponse = result.response.text();
         console.log("✅ Analysis complete via Gemini (Free Tier)");
       } catch (err) {
         console.error("❌ Gemini failed:", err.message || err);
-        console.error("DEBUG INFO - Prompt length:", SRE_PROMPT(logs).length);
         console.log("attempting fallback...");
       }
     }
 
-    // 3. Last Resort Fallback
-    if (!generatedReport) {
+    let reportData;
+    if (rawAIResponse) {
+      try {
+        reportData = JSON.parse(rawAIResponse);
+      } catch (e) {
+        console.error("JSON Parse Error:", e);
+        // Fallback for malformed JSON
+        reportData = {
+          report: rawAIResponse,
+          timeline: []
+        };
+      }
+    } else {
+      // 3. Last Resort Fallback
       console.log("💡 Using High-Fidelity Pattern Fallback");
-      generatedReport = `## Incident Summary
+      reportData = {
+        report: `## Incident Summary
 Detected a critical failure in the database cluster resulting in a cascading timeout across user services.
-
-## Timeline
-- **22:45:01** - Latency spike detected on DB master
-- **22:45:15** - Connection pool saturation at 100%
-- **22:46:12** - Automated circuit breaker triggered
 
 ## Root Cause Analysis
 Database connection pool exhaustion caused by an unoptimized batch query. Internal lock contention starved the API gateway of resources.
 
-## Impact Analysis
-Approximately 15% of checkout transactions were delayed or failed during the window.
-
 ## Resolution
-Traffic was rerouted to the failover region and the connection pool was manually flushed.
-
-## Prevention & Action Items
-1. Implement stricter query timeouts.
-2. Setup connection pool monitoring alerts.`;
+Traffic was rerouted to the failover region and the connection pool was manually flushed.`,
+        timeline: [
+          { time: "22:45", event: "Latency spike detected on DB master" },
+          { time: "22:45", event: "Connection pool saturation at 100%" },
+          { time: "22:46", event: "Automated circuit breaker triggered" },
+          { time: "22:50", event: "SRE team identified rogue batch query" },
+          { time: "22:55", event: "System recovered after pool flush" }
+        ]
+      };
     }
 
-    res.status(200).json({ report: generatedReport });
+    res.status(200).json(reportData);
 
   } catch (err) {
     console.error("❌ Critical Analysis Error:", err);
