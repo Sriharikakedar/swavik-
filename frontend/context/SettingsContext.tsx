@@ -7,6 +7,8 @@ interface SettingsContextType {
   setAutoParsing: (val: boolean) => void;
   incidentAlerts: boolean;
   setIncidentAlerts: (val: boolean) => void;
+  alertEmail: string;
+  setAlertEmail: (val: string) => void;
   theme: 'light' | 'dark';
   setTheme: (theme: 'light' | 'dark') => void;
 }
@@ -30,6 +32,11 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return saved !== null ? JSON.parse(saved) : true;
   });
 
+  const [alertEmail, setAlertEmail] = useState(() => {
+    const saved = localStorage.getItem('resolvex_alertEmail');
+    return saved || 'admin@resolvex.ai';
+  });
+
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const saved = localStorage.getItem('resolvex_theme');
     return (saved as 'light' | 'dark') || 'light';
@@ -49,6 +56,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [incidentAlerts]);
 
   useEffect(() => {
+    localStorage.setItem('resolvex_alertEmail', alertEmail);
+  }, [alertEmail]);
+
+  useEffect(() => {
     localStorage.setItem('resolvex_theme', theme);
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -62,6 +73,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       aiDetection, setAiDetection,
       autoParsing, setAutoParsing,
       incidentAlerts, setIncidentAlerts,
+      alertEmail, setAlertEmail,
       theme, setTheme
     }}>
       {children}

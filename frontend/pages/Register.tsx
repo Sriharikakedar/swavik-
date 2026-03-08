@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth } from '../firebase/firebase';
+import { auth, db } from '../firebase/firebase';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
 interface RegisterProps {
@@ -35,6 +36,15 @@ const Register: React.FC<RegisterProps> = ({ setIsAuthenticated }) => {
       if (userCredential.user) {
         await updateProfile(userCredential.user, {
           displayName: name
+        });
+
+        // Save to Firestore users collection
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+          name: name,
+          email: email,
+          uid: userCredential.user.uid,
+          role: "SRE", // Default role
+          createdAt: serverTimestamp()
         });
       }
 

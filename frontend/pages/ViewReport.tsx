@@ -24,7 +24,7 @@ const ViewReport: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const { report, id, title, date, severity, assignee, priority } = location.state
+  const { report, id, title, date, severity, assignee, priority, similarIncident, recommendedSOPs, resolutionTimeline } = location.state
 
   const [comments, setComments] = React.useState<Comment[]>([]);
   const [newComment, setNewComment] = React.useState("");
@@ -231,6 +231,43 @@ const ViewReport: React.FC = () => {
         </div>
       </div>
 
+      {/* NEW: Resolution Timeline (Visual Process Flow) */}
+      {resolutionTimeline && (
+        <div className="mb-12 bg-white/50 border border-theme-border p-8 rounded-[2rem] shadow-sm">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-8 h-8 rounded-lg bg-theme-text flex items-center justify-center">
+              <i className="fas fa-microchip text-white text-xs"></i>
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-theme-text uppercase tracking-tight">Resolution lifecycle</h2>
+              <p className="text-[10px] font-bold text-theme-dim tracking-[0.2em] uppercase">Automated Intelligence matching</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative">
+            {/* Connecting Line (Desktop) */}
+            <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-theme-border -translate-y-1/2 z-0"></div>
+
+            {resolutionTimeline.map((step: any, idx: number) => (
+              <div key={idx} className="relative z-10 flex flex-row md:flex-col items-center gap-4 md:text-center w-full md:w-auto">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center border-4 border-theme-bg shadow-lg transition-all ${step.status === 'completed' ? 'bg-theme-accent text-white' : 'bg-theme-card text-theme-dim'
+                  }`}>
+                  {step.status === 'completed' ? (
+                    <i className="fas fa-check text-xs"></i>
+                  ) : (
+                    <div className="w-1.5 h-1.5 rounded-full bg-theme-dim animate-pulse"></div>
+                  )}
+                </div>
+                <div className="flex flex-col md:items-center">
+                  <p className="text-[10px] font-black text-theme-text uppercase tracking-widest">{step.step}</p>
+                  <p className="text-[9px] font-bold text-theme-dim">{step.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Incident Timeline Section */}
       {report.timeline && report.timeline.length > 0 && (
         <div className="mb-20">
@@ -259,11 +296,111 @@ const ViewReport: React.FC = () => {
         </div>
       )}
 
+      {/* NEW: Recommended SOPs (Rule-Based Engine) */}
+      {recommendedSOPs && recommendedSOPs.length > 0 && (
+        <div className="mb-12 bg-[#1A2B4C] text-white p-8 rounded-[2rem] shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+            <i className="fas fa-shield-halved text-7xl"></i>
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="flex h-2 w-2 rounded-full bg-theme-accent animate-ping"></span>
+              <h2 className="text-xl font-black uppercase tracking-tighter">Verified Standard Actions</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {recommendedSOPs.map((sop: string, idx: number) => (
+                <div key={idx} className="bg-white/10 hover:bg-white/15 p-4 rounded-xl border border-white/5 transition-colors flex items-start gap-3">
+                  <div className="mt-1 w-5 h-5 rounded bg-theme-accent flex items-center justify-center flex-shrink-0">
+                    <span className="text-[8px] font-black">{idx + 1}</span>
+                  </div>
+                  <p className="text-[11px] font-bold leading-relaxed">{sop}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Similar Incident Found - AI Knowledge Base */}
+      {similarIncident && (
+        <div className="mb-12 bg-theme-bg border-2 border-theme-accent/30 p-8 rounded-[2rem] shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-6 opacity-5">
+            <i className="fas fa-microchip text-7xl text-theme-text"></i>
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-theme-accent flex items-center justify-center">
+                <i className="fas fa-magnifying-glass text-white text-xs"></i>
+              </div>
+              <h2 className="text-xl font-black text-theme-text">Similar Past Incident Found</h2>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-theme-card/50 p-4 rounded-xl border border-theme-border">
+                <p className="text-[10px] font-black text-theme-dim uppercase tracking-widest mb-1">Previous Case</p>
+                <p className="text-sm font-bold text-theme-text">{similarIncident.title}</p>
+              </div>
+
+              <div className="bg-white/40 p-5 rounded-xl border border-theme-accent/10">
+                <p className="text-[10px] font-black text-theme-accent uppercase tracking-widest mb-2">Verified Solution</p>
+                <p className="text-sm text-theme-text leading-relaxed italic">"{similarIncident.solution}"</p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-center gap-2 text-[10px] font-bold text-theme-dim bg-theme-accent/5 px-3 py-1.5 rounded-full w-fit">
+              <i className="fas fa-circle-check text-theme-accent"></i>
+              REUSING THIS SOLUTION CAN REDUCE MTTR BY ~40%
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SOP Section Highlight */}
+      {(() => {
+        const sopMatch = report.match(/## Standard Operating Procedure \(SOP\)([\s\S]*?)(?=##|$)/);
+        if (sopMatch) {
+          const sopContent = sopMatch[1].trim();
+          return (
+            <div className="mb-12 bg-navy border border-orange/20 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                <i className="fas fa-shield-alt text-8xl text-white"></i>
+              </div>
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-theme-accent flex items-center justify-center shadow-lg shadow-orange/20">
+                    <i className="fas fa-list-check text-white"></i>
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black text-white leading-tight">Standard Operating Procedure</h2>
+                    <p className="text-theme-accent text-[10px] font-black uppercase tracking-[0.2em]">Mandatory Mitigation Steps</p>
+                  </div>
+                </div>
+                <div
+                  className="prose-resolve-dark text-cream/90 text-sm leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: marked.parse(sopContent) as string }}
+                />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(sopContent);
+                    toast.success("SOP copied to clipboard");
+                  }}
+                  className="mt-8 px-6 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white rounded-xl transition-all flex items-center gap-2"
+                >
+                  <i className="fas fa-copy"></i>
+                  Copy Procedure
+                </button>
+              </div>
+            </div>
+          );
+        }
+        return null;
+      })()}
+
       <div className="bg-theme-card border border-theme-border p-12 rounded-[2.5rem] mb-10 shadow-2xl overflow-hidden relative group max-w-full">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-theme-accent to-transparent opacity-50"></div>
         <div
           className="prose-resolve break-words whitespace-pre-wrap text-theme-text"
-          dangerouslySetInnerHTML={{ __html: marked.parse(report) as string }}
+          dangerouslySetInnerHTML={{ __html: marked.parse(report.replace(/## Standard Operating Procedure \(SOP\)[\s\S]*?(?=##|$)/, '')) as string }}
         />
       </div>
 
