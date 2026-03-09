@@ -215,7 +215,7 @@ const Footer: React.FC = () => {
     <footer className="bg-navy py-16 text-white">
       <div className="max-w-7xl mx-auto px-6">
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-32">
 
           {/* Brand */}
           <div>
