@@ -229,7 +229,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Platform */}
-          <div>
+          <div className="md:text-center">
             <h3 className="text-sm tracking-widest text-gray-400 mb-4 uppercase font-bold">
               Platform
             </h3>
@@ -250,7 +250,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Connect */}
-          <div>
+          <div className="md:text-right">
             <h3 className="text-sm tracking-widest text-gray-400 mb-4 uppercase font-bold">
               Connect
             </h3>
