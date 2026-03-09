@@ -212,77 +212,58 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-navy border-t border-navy/20 text-cream/70">
-      <div className="max-w-7xl mx-auto px-12 py-16 grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
+    <footer className="bg-navy py-16 text-white">
+      <div className="max-w-7xl mx-auto px-6">
 
-        <div className="text-left">
-          <h2 className="text-2xl font-bold text-white mb-4">
-            ResolveX
-          </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
 
-          <p className="text-sm text-cream/60 leading-relaxed max-w-xs">
-            AI-powered incident intelligence platform for faster resolution and smarter prevention.
-          </p>
+          {/* Brand */}
+          <div>
+            <h2 className="text-2xl font-bold">ResolveX</h2>
+            <p className="mt-4 text-gray-300 text-sm leading-relaxed max-w-xs">
+              AI-powered incident intelligence platform for faster resolution and smarter prevention.
+            </p>
+            <p className="mt-6 text-sm text-gray-400">
+              © 2026 ResolveX. All rights reserved.
+            </p>
+          </div>
 
-          <p className="text-xs text-white/40 mt-6">
-            © 2026 ResolveX. All rights reserved.
-          </p>
-        </div>
+          {/* Platform */}
+          <div>
+            <h3 className="text-sm tracking-widest text-gray-400 mb-4 uppercase font-bold">
+              Platform
+            </h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/dashboard" className="hover:text-theme-accent transition-colors">Dashboard</Link>
+              </li>
+              <li>
+                <Link to="/new-report" className="hover:text-theme-accent transition-colors">Create Report</Link>
+              </li>
+              <li>
+                <Link to="/search" className="hover:text-theme-accent transition-colors">Search Reports</Link>
+              </li>
+              <li>
+                <Link to="/analytics" className="hover:text-theme-accent transition-colors">Analytics</Link>
+              </li>
+            </ul>
+          </div>
 
-        <div className="text-center">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-white/60 mb-6">
-            Platform
-          </h3>
+          {/* Connect */}
+          <div>
+            <h3 className="text-sm tracking-widest text-gray-400 mb-4 uppercase font-bold">
+              Connect
+            </h3>
+            <ul className="space-y-2 text-sm">
+              <li className="hover:text-theme-accent transition-colors cursor-pointer">LinkedIn</li>
+              <li className="hover:text-theme-accent transition-colors cursor-pointer">Email Support</li>
+              <li className="hover:text-theme-accent transition-colors cursor-pointer">Documentation</li>
+            </ul>
+          </div>
 
-          <ul className="space-y-3 text-sm">
-            <li>
-              <Link to="/dashboard" className="hover:text-white transition-colors">
-                Dashboard
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/new-report" className="hover:text-white transition-colors">
-                Create Report
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/search" className="hover:text-white transition-colors">
-                Search Reports
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/analytics" className="hover:text-white transition-colors">
-                Analytics
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        <div className="text-right">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-white/60 mb-6">
-            Connect
-          </h3>
-
-          <ul className="space-y-3 text-sm">
-            <li className="hover:text-white transition-colors cursor-pointer">
-              LinkedIn
-            </li>
-
-            <li className="hover:text-white transition-colors cursor-pointer">
-              Email Support
-            </li>
-
-            <li className="hover:text-white transition-colors cursor-pointer">
-              Documentation
-            </li>
-          </ul>
         </div>
 
       </div>
-
     </footer>
   );
 };
